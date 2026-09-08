@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>日本旅行极简速查</title>
+  <style>
+    :root {
+      --primary: #d9383a;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #212529;
+      --text-sub: #6c757d;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+    header {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .tips {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+    /* 分类标签栏 */
+    .categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .categories::-webkit-scrollbar {
+      display: none;
+    }
+    .cat-btn {
+      white-space: nowrap;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #dee2e6;
+      background: #fff;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .cat-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    /* 列表卡片 */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      border: 1px solid #edf2f7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .card:active {
+      background: #f1f3f5;
+    }
+    .card-content {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .jp-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 4px;
+    }
+    .kana-text {
+      font-size: 0.85rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .zh-text {
+      font-size: 0.95rem;
+      color: var(--text-sub);
+    }
+    .sound-btn {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .sound-btn:active {
+      background: #dee2e6;
+    }
+    /* 全屏展示模态框（直接伸手给店员看） */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-card {
+      background: #fff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px;
+      padding: 32px 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: popIn 0.2s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-jp {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #000;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+    .modal-kana {
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .modal-zh {
+      font-size: 1.2rem;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      border-top: 1px dashed #dee2e6;
+      padding-top: 16px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-sound {
+      background: #e9ecef;
+      color: #333;
+    }
+    .btn-close {
+      background: var(--primary);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🇯🇵 应急极简速查卡</h1>
+    <p class="tips">点击卡片出示大字 ｜ 点击 🔊 播放发音</p>
+  </header>
+
+  <!-- 场景切换 -->
+  <div class="categories" id="catBar">
+    <button class="cat-btn active" onclick="filterCat('all', this)">全部</button>
+    <button class="cat-btn" onclick="filterCat('万能', this)">万能救命</button>
+    <button class="cat-btn" onclick="filterCat('餐厅', this)">餐厅吃饭</button>
+    <button class="cat-btn" onclick="filterCat('购物', this)">结账购物</button>
+    <button class="cat-btn" onclick="filterCat('交通', this)">问路电车</button>
+    <button class="cat-btn" onclick="filterCat('紧急', this)">突发求助</button>
+  </div>
+
+  <!-- 卡片列表 -->
+  <div class="card-list" id="list"></div>
+
+  <!-- 全屏大字弹窗 -->
+  <div class="modal" id="modal" onclick="closeModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-jp" id="mJp"></div>
+      <div class="modal-kana" id="mKana"></div>
+      <div class="modal-zh" id="mZh"></div>
+      <div class="modal-actions">
+        <button class="btn btn-sound" id="mSoundBtn">🔊 播放声音</button>
+        <button class="btn btn-close" onclick="closeModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 常用语句数据
+    const PHRASES = [
+      // 万能
+      { cat: '万能', jp: 'すみません', kana: 'Sumimasen（苏米马森）', zh: '不好意思 / 打扰一下 / 谢谢' },
+      { cat: '万能', jp: 'これ、お願いします', kana: 'Kore, onegaishimasu（阔咧，哦内嘎伊西马斯）', zh: '请给我这个（手指菜单/商品）' },
+      { cat: '万能', jp: '大丈夫です', kana: 'Daijōbu desu（呆久布得斯）', zh: '不用了 / 没关系（摆手）' },
+      { cat: '万能', jp: 'ありがとうございます', kana: 'Arigatō gozaimasu（阿里嘎多 搞杂伊马斯）', zh: '非常感谢！' },
+
+      // 餐厅
+      { cat: '餐厅', jp: 'お会計をお願いします', kana: 'Okaikei o onegaishimasu', zh: '请结账（买单）' },
+      { cat: '餐厅', jp: '一人です', kana: 'Hitori desu（比数字 1）', zh: '一位（用餐人数）' },
+      { cat: '餐厅', jp: 'お水をください', kana: 'Omizu o kudasai', zh: '请给我一杯水' },
+      { cat: '餐厅', jp: '英語のメニューはありますか？', kana: 'Eigo no menyū wa arimasu ka?', zh: '有英文菜单吗？' },
+      { cat: '餐厅', jp: 'おすすめは何ですか？', kana: 'Osusume wa nan desu ka?', zh: '有什么推荐的吗？' },
+
+      // 购物
+      { cat: '购物', jp: '袋は要りません', kana: 'Fukuro wa irimasen', zh: '不需要塑料袋' },
+      { cat: '购物', jp: '免税できますか？', kana: 'Menzei dekimasu ka?', zh: '请问可以免税吗？' },
+      { cat: '购物', jp: 'クレジットカードは使えますか？', kana: 'Kurejitto kādo wa tsukaemasu ka?', zh: '可以用信用卡吗？' },
+
+      // 交通 & 问路
+      { cat: '交通', jp: 'トイレはどこですか？', kana: 'Toire wa doko desu ka?', zh: '请问洗手间在哪里？' },
+      { cat: '交通', jp: 'ここに行きたいです', kana: 'Koko ni ikitai desu', zh: '我想去这里（展示地图）' },
+      { cat: '交通', jp: 'この電車は〇〇に行きますか？', kana: 'Kono densha wa... ni ikimasu ka?', zh: '这趟车到……吗？' },
+
+      // 紧急
+      { cat: '紧急', jp: '日本語が分かりません', kana: 'Nihongo ga wakarimasen', zh: '我不会说日语' },
+      { cat: '紧急', jp: '助けてください', kana: 'Tasukete kudasai', zh: '请帮帮我！' }
+    ];
+
+    let currentItem = null;
+
+    // 语音朗读
+    function speak(text) {
+      if (!('speechSynthesis' in window)) {
+        alert('您的浏览器暂不支持语音合成');
+        return;
+      }
+      window.speechSynthesis.cancel(); // 停止前面的播放
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'ja-JP';
+      utter.rate = 0.85; // 语速稍慢一点更清晰
+      window.speechSynthesis.speak(utter);
+    }
+
+    // 渲染卡片
+    function renderList(cat = 'all') {
+      const container = document.getElementById('list');
+      container.innerHTML = '';
+      const filtered = cat === 'all' ? PHRASES : PHRASES.filter(item => item.cat === cat);
+
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div class="card-content" onclick="openModal('${encodeURIComponent(JSON.stringify(item))}')">
+            <div class="jp-text">${item.jp}</div>
+            <div class="kana-text">${item.kana}</div>
+            <div class="zh-text">${item.zh}</div>
+          </div>
+          <button class="sound-btn" onclick="speak('${item.jp}')" title="播放读音">🔊</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // 分类切换
+    function filterCat(cat, btn) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList(cat);
+    }
+
+    // 弹出大字
+    function openModal(dataStr) {
+      const item = JSON.parse(decodeURIComponent(dataStr));
+      currentItem = item;
+      document.getElementById('mJp').innerText = item.jp;
+      document.getElementById('mKana').innerText = item.kana;
+      document.getElementById('mZh').innerText = item.zh;
+      document.getElementById('mSoundBtn').onclick = () => speak(item.jp);
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    // 初始化渲染
+    renderList('all');
+  </script>
+</body>
+</html>
