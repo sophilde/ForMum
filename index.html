@@ -1,324 +1,464 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>日本旅行极简速查</title>
-  <style>
-    :root {
-      --primary: #d9383a;
-      --bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-main: #212529;
-      --text-sub: #6c757d;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
-      padding: 16px;
-      padding-bottom: 80px;
-    }
-    header {
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    header h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .tips {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-    }
-    /* 分类标签栏 */
-    .categories {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-      scrollbar-width: none;
-    }
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
-    .cat-btn {
-      white-space: nowrap;
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid #dee2e6;
-      background: #fff;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    .cat-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-    /* 列表卡片 */
-    .card-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-      border: 1px solid #edf2f7;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
-    .card:active {
-      background: #f1f3f5;
-    }
-    .card-content {
-      flex: 1;
-      padding-right: 12px;
-    }
-    .jp-text {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #111;
-      margin-bottom: 4px;
-    }
-    .kana-text {
-      font-size: 0.85rem;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-    .zh-text {
-      font-size: 0.95rem;
-      color: var(--text-sub);
-    }
-    .sound-btn {
-      background: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-    .sound-btn:active {
-      background: #dee2e6;
-    }
-    /* 全屏展示模态框（直接伸手给店员看） */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .modal.show {
-      display: flex;
-    }
-    .modal-card {
-      background: #fff;
-      width: 100%;
-      max-width: 480px;
-      border-radius: 20px;
-      padding: 32px 20px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      animation: popIn 0.2s ease-out;
-    }
-    @keyframes popIn {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .modal-jp {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #000;
-      line-height: 1.3;
-      margin-bottom: 12px;
-      word-break: break-all;
-    }
-    .modal-kana {
-      font-size: 1.1rem;
-      color: var(--primary);
-      margin-bottom: 16px;
-    }
-    .modal-zh {
-      font-size: 1.2rem;
-      color: var(--text-sub);
-      margin-bottom: 24px;
-      border-top: 1px dashed #dee2e6;
-      padding-top: 16px;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-    }
-    .btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-    }
-    .btn-sound {
-      background: #e9ecef;
-      color: #333;
-    }
-    .btn-close {
-      background: var(--primary);
-      color: #fff;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>日本旅行速查卡 · Kyoto & Osaka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F7F1E4; --surface: #FFFFFF;
+    --ink: #23303D; --ink-soft: #4B5A68; --muted: #8B93A0; --line: #E7DCC3;
+    --indigo: #1F3A5F; --indigo-dark: #142943;
+    --shu: #C43D3D; --gold: #B8802C; --gold-soft: #F3E6CE;
+    --matcha: #4E7A5B; --slate: #3E6B8A; --plum: #7A5980;
+    --alert: #A31E2A; --fav: #E5A93B;
+    --radius: 14px;
+    --shadow: 0 2px 8px rgba(35,48,61,0.08), 0 8px 24px rgba(35,48,61,0.06);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0; background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC","Noto Sans JP",sans-serif;
+    -webkit-font-smoothing: antialiased; padding-bottom: 120px; /* 留出底部悬浮按钮空间 */
+  }
+
+  /* ---------- Header ---------- */
+  .hero{
+    padding: 36px 20px 22px;
+    background: linear-gradient(155deg, var(--indigo) 0%, var(--indigo-dark) 78%);
+    color: #F4EFE1; position: relative; overflow: hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-40px; top:-60px;
+    width:220px; height:220px; border-radius:50%;
+    background: radial-gradient(circle, rgba(196,61,61,0.35), transparent 70%);
+  }
+  .hero-eyebrow{ font-family:"Zen Maru Gothic",sans-serif; font-size: 13px; color: #E9A98E; margin: 0 0 6px; }
+  .hero h1{ margin: 0 0 6px; font-family:"Zen Maru Gothic",sans-serif; font-size: clamp(24px, 6vw, 30px); }
+  .hero p{ margin: 0; font-size: 13px; color: #C9D2DC; line-height: 1.5; }
+
+  .search-wrap{ position: relative; z-index: 2; margin-top: 16px; }
+  .search-wrap input{
+    width: 100%; padding: 12px 16px 12px 42px; border-radius: 99px;
+    border: none; background: rgba(255,255,255,0.95);
+    font-size: 15px; box-shadow: var(--shadow);
+  }
+  .search-icon{ position:absolute; left:16px; top:50%; transform: translateY(-50%); width:16px; opacity:.5; }
+
+  /* ---------- Nav ---------- */
+  .cat-nav{
+    position: sticky; top:0; z-index: 20; display:flex; gap:8px;
+    padding: 12px 16px; background: rgba(247,241,228,0.95);
+    backdrop-filter: blur(8px); overflow-x:auto; border-bottom: 1px solid var(--line);
+  }
+  .cat-nav::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex: 0 0 auto; display:flex; align-items:center; gap:6px;
+    padding: 8px 14px; border-radius: 99px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink-soft); font-size: 13.5px;
+    text-decoration:none; white-space: nowrap; transition: 0.2s;
+  }
+  .chip .dot{ width:8px; height:8px; border-radius:50%; }
+  .chip.active{ color:#fff; border-color: transparent; }
+
+  /* ---------- Sections & Cards ---------- */
+  main{ max-width: 720px; margin: 0 auto; padding: 10px 16px 0; }
+  .section{ padding-top: 24px; scroll-margin-top: 70px; }
+  .section-head{ display:flex; align-items:baseline; gap:10px; margin-bottom: 12px; }
+  .section-head h2{ margin:0; font-size: 18px; font-family:"Zen Maru Gothic",sans-serif; }
+  .card-list{ display:flex; flex-direction:column; gap:12px; }
+
+  .card{
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--cat-color); border-radius: var(--radius);
+    padding: 14px; box-shadow: var(--shadow); position: relative;
+  }
+  .card .zh{ font-size: 14.5px; color: var(--ink-soft); margin-bottom: 6px; padding-right: 30px;}
+  .card .jp{ font-family:"Noto Sans JP",sans-serif; font-weight: 700; font-size: 21px; color: var(--ink); line-height: 1.4; }
+  .card .romaji{ font-size: 12.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
+  .card .note{ margin-top: 8px; font-size: 13px; color: #6D511B; background: var(--gold-soft); border-radius: 8px; padding: 8px 12px; line-height: 1.5; }
+  
+  .btn-fav{
+    position: absolute; top: 12px; right: 12px;
+    background: none; border: none; font-size: 20px; color: var(--line); padding: 5px;
+  }
+  .btn-fav.active{ color: var(--fav); }
+
+  .card-actions{ display:flex; gap:8px; margin-top: 12px; }
+  .card-actions button{
+    flex: 1; display:flex; justify-content:center; align-items:center; gap:6px;
+    font-size: 13px; font-weight: 500; padding: 10px;
+    border-radius: 8px; border: 1px solid var(--line); background: #FBF8F1; color: var(--ink);
+  }
+  .card-actions button:active{ background: #E7DCC3; }
+  .card-actions svg{ width:16px; height:16px; }
+
+  .hidden{ display:none !important; }
+  .empty-state{ text-align:center; color: var(--muted); padding: 40px 16px; font-size: 14px; }
+
+  /* ---------- Tips Section ---------- */
+  .tip-box{
+    background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow);
+  }
+  .tip-box h3{ margin: 0 0 8px 0; font-size: 15px; display:flex; align-items:center; gap:6px; color: var(--indigo); }
+  .tip-box p{ margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+  .tip-box ul{ margin: 8px 0 0; padding-left: 20px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+  .tip-box li{ margin-bottom: 4px; }
+  .toilet-btns{ display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;}
+  .t-btn{ border:1px solid #ccc; border-radius:6px; padding:4px 8px; font-size:12px; background:#f9f9f9; }
+  .t-btn.red{ color: #A31E2A; border-color: #A31E2A; font-weight:bold;}
+
+  /* ---------- Overlay ---------- */
+  .overlay{
+    position: fixed; inset:0; z-index: 100; background: rgba(20, 41, 67, 0.95); backdrop-filter: blur(5px);
+    color: #F7F1E4; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 24px; text-align:center;
+  }
+  .overlay .zh{ font-size:18px; color:#C9D2DC; margin-bottom:24px; }
+  .overlay .jp{ font-family:"Noto Sans JP",sans-serif; font-weight:900; font-size: clamp(36px, 12vw, 60px); line-height:1.4; }
+  .overlay .romaji{ margin-top:20px; font-size:16px; color:#9FB0C0; font-style:italic; }
+  .overlay-close{
+    position:absolute; top:20px; right:20px; width:44px; height:44px; border-radius:50%;
+    background: rgba(255,255,255,0.2); border:none; color:#fff; font-size:20px;
+  }
+
+  /* ---------- Floating Buttons ---------- */
+  .fab-container{
+    position: fixed; right:16px; bottom:20px; z-index: 30;
+    display:flex; flex-direction:column; gap:12px; align-items: flex-end;
+  }
+  .fab{
+    border-radius: 99px; padding: 12px 20px; font-size: 14px; font-weight: 700;
+    display:flex; align-items:center; gap:8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border:none; color:#fff;
+  }
+  .fab-icebreaker{ background: var(--indigo); }
+  .fab-sos{ background: var(--alert); }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>🇯🇵 应急极简速查卡</h1>
-    <p class="tips">点击卡片出示大字 ｜ 点击 🔊 播放发音</p>
-  </header>
-
-  <!-- 场景切换 -->
-  <div class="categories" id="catBar">
-    <button class="cat-btn active" onclick="filterCat('all', this)">全部</button>
-    <button class="cat-btn" onclick="filterCat('万能', this)">万能救命</button>
-    <button class="cat-btn" onclick="filterCat('餐厅', this)">餐厅吃饭</button>
-    <button class="cat-btn" onclick="filterCat('购物', this)">结账购物</button>
-    <button class="cat-btn" onclick="filterCat('交通', this)">问路电车</button>
-    <button class="cat-btn" onclick="filterCat('紧急', this)">突发求助</button>
+<header class="hero">
+  <p class="hero-eyebrow">京都 · 大阪 · 妈妈的旅行助手</p>
+  <h1>日本旅行速查卡</h1>
+  <p>按场景查一句就好。先按“收藏(心形)”可置顶。点喇叭听发音，或点“放大展示”直接给对方看。</p>
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#23303D" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="搜索一句话，比如「过敏」「厕所」…">
   </div>
+</header>
 
-  <!-- 卡片列表 -->
-  <div class="card-list" id="list"></div>
+<nav class="cat-nav" id="catNav">
+  <a href="#fav" class="chip" data-target="fav" style="--chip-color:#E5A93B"><span class="dot" style="background:#E5A93B"></span>⭐ 收藏</a>
+</nav>
 
-  <!-- 全屏大字弹窗 -->
-  <div class="modal" id="modal" onclick="closeModal(event)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <div class="modal-jp" id="mJp"></div>
-      <div class="modal-kana" id="mKana"></div>
-      <div class="modal-zh" id="mZh"></div>
-      <div class="modal-actions">
-        <button class="btn btn-sound" id="mSoundBtn">🔊 播放声音</button>
-        <button class="btn btn-close" onclick="closeModal()">关闭</button>
+<main id="main">
+  <!-- Tips Section -->
+  <section class="section" id="tips">
+    <div class="section-head"><span class="icon">💡</span><h2>当地实用提醒</h2></div>
+    
+    <div class="tip-box">
+      <h3>🚆 交通与乘车</h3>
+      <ul>
+        <li><b>车厢分离：</b>日本有些火车开到一半会“脱钩”去不同方向，上车前一定要确认车厢外屏幕写的目的地。</li>
+        <li><b>静音文化：</b>在电车、公交上请保持安静，<b>绝对不要接打语音/电话</b>。优先座(Priority Seat)可以坐，但遇到老人孕妇需让座。</li>
+        <li><b>Suica(西瓜卡)：</b>不需要买实体卡，直接在苹果钱包(Apple Wallet)里搜索添加“Suica”并用Apple Pay充值即可，直接刷手机进站。</li>
+      </ul>
+    </div>
+    
+    <div class="tip-box">
+      <h3>🍱 餐饮与购物</h3>
+      <ul>
+        <li><b>餐厅点单：</b>如果桌上有平板直接点；如果没有，需要出声喊「Sumimasen（不好意思）」叫服务员。</li>
+        <li><b>结账与小费：</b>日本<b>绝对不收小费</b>。付钱或递信用卡时，请放在收银台的**小托盘**里，不要直接递到店员手里。</li>
+        <li><b>满座提示：</b>如果走到餐厅门口，店员对你**双臂在胸前比个“X”**，说明客满或已经停止营业了，不是针对你哦。</li>
+        <li><b>随身垃圾袋：</b>街上极少有垃圾桶。请随身带个塑料袋装垃圾，回酒店或在便利店丢弃。</li>
+      </ul>
+    </div>
+
+    <div class="tip-box">
+      <h3>🚽 复杂马桶按钮认字</h3>
+      <p>日本马桶按钮多，千万别按错红色的求救键！</p>
+      <div class="toilet-btns">
+        <span class="t-btn">大 / 小</span> = 冲水
+        <span class="t-btn">流す (Nagasu)</span> = 冲水
+        <span class="t-btn">止</span> = 停止喷水
+        <span class="t-btn">音姫 (Otohime)</span> = 播放流水声掩盖声音
+        <span class="t-btn red">呼出 / 紧急</span> = 🚨救护铃(不要按)
       </div>
     </div>
-  </div>
+    
+    <div class="tip-box">
+      <h3>🏨 实用后勤贴士</h3>
+      <ul>
+        <li><b>网络：</b>用随身WiFi热点最稳，不需要换卡。</li>
+        <li><b>行李寄送(宅急便)：</b>如果嫌换酒店拿行李累，前台通常可以办理「Takkyubin(宅急便)」，把大行李直接寄到大阪的酒店，大概100多人民币/件，非常省力。</li>
+        <li><b>深夜觅食：</b>万一太晚找不到吃的，全家(FamilyMart)、7-11、罗森(Lawson)是完美救星，便当请店员加热(Atatame)即可。</li>
+      </ul>
+    </div>
+  </section>
+</main>
 
-  <script>
-    // 常用语句数据
-    const PHRASES = [
-      // 万能
-      { cat: '万能', jp: 'すみません', kana: 'Sumimasen（苏米马森）', zh: '不好意思 / 打扰一下 / 谢谢' },
-      { cat: '万能', jp: 'これ、お願いします', kana: 'Kore, onegaishimasu（阔咧，哦内嘎伊西马斯）', zh: '请给我这个（手指菜单/商品）' },
-      { cat: '万能', jp: '大丈夫です', kana: 'Daijōbu desu（呆久布得斯）', zh: '不用了 / 没关系（摆手）' },
-      { cat: '万能', jp: 'ありがとうございます', kana: 'Arigatō gozaimasu（阿里嘎多 搞杂伊马斯）', zh: '非常感谢！' },
+<div class="fab-container">
+  <button class="fab fab-icebreaker" onclick="openIcebreaker()">
+    🙋‍♀️ 翻译沟通开场白
+  </button>
+  <a href="#emergency" class="fab fab-sos">
+    🚨 紧急求助用语
+  </a>
+</div>
 
-      // 餐厅
-      { cat: '餐厅', jp: 'お会計をお願いします', kana: 'Okaikei o onegaishimasu', zh: '请结账（买单）' },
-      { cat: '餐厅', jp: '一人です', kana: 'Hitori desu（比数字 1）', zh: '一位（用餐人数）' },
-      { cat: '餐厅', jp: 'お水をください', kana: 'Omizu o kudasai', zh: '请给我一杯水' },
-      { cat: '餐厅', jp: '英語のメニューはありますか？', kana: 'Eigo no menyū wa arimasu ka?', zh: '有英文菜单吗？' },
-      { cat: '餐厅', jp: 'おすすめは何ですか？', kana: 'Osusume wa nan desu ka?', zh: '有什么推荐的吗？' },
+<div class="overlay hidden" id="overlay">
+  <button class="overlay-close" id="overlayClose">✕</button>
+  <div class="zh" id="overlayZh"></div>
+  <div class="jp" id="overlayJp"></div>
+  <div class="romaji" id="overlayRomaji"></div>
+</div>
 
-      // 购物
-      { cat: '购物', jp: '袋は要りません', kana: 'Fukuro wa irimasen', zh: '不需要塑料袋' },
-      { cat: '购物', jp: '免税できますか？', kana: 'Menzei dekimasu ka?', zh: '请问可以免税吗？' },
-      { cat: '购物', jp: 'クレジットカードは使えますか？', kana: 'Kurejitto kādo wa tsukaemasu ka?', zh: '可以用信用卡吗？' },
+<script>
+const DATA = [
+  {
+    id: 'basic', name: '基础与翻译辅助', icon: '🙇', color: '#1F3A5F',
+    phrases: [
+      { zh:'不好意思，我是游客，不太会日语，可能需要用翻译器交流，谢谢您的耐心', jp:'すみません、観光客で日本語が話せないので、翻訳アプリを使います。ご協力ありがとうございます', romaji:"Sumimasen, kankoukyaku de nihongo ga hanasenai node, hon'yaku apuri wo tsukaimasu. Gokyouryoku arigatou gozaimasu" },
+      { zh:'麻烦您写下来好吗？', jp:'ここに書いてもらえますか？', romaji:'Koko ni kaite moraemasu ka?' },
+      { zh:'麻烦您对着我的手机（翻译软件）说，可以吗？', jp:'この翻訳アプリに向かって話してもらえますか？', romaji:'Kono hon\'yaku apuri ni mukatte hanashite moraemasu ka?' },
+      { zh:'对不起，我听不懂', jp:'すみません、日本語がわかりません', romaji:'Sumimasen, nihongo ga wakarimasen' },
+      { zh:'你好', jp:'こんにちは', romaji:'Konnichiwa' },
+      { zh:'谢谢', jp:'ありがとうございます', romaji:'Arigatou gozaimasu' },
+      { zh:'不好意思 / 打扰一下', jp:'すみません', romaji:'Sumimasen' },
+      { zh:'数字 1～10', jp:'一 二 三 四 五 六 七 八 九 十', romaji:'ichi, ni, san, yon, go, roku, nana, hachi, kyuu, juu', note:'买东西、指菜单比划时配合使用' }
+    ]
+  },
+  {
+    id: 'restaurant', name: '餐厅点单', icon: '🍜', color: '#C43D3D',
+    phrases: [
+      { zh:'一位', jp:'一人です', romaji:'Hitori desu' },
+      { zh:'两位', jp:'二人です', romaji:'Futari desu' },
+      { zh:'请问找谁点单？（呼唤服务员）', jp:'すみません、注文をお願いします', romaji:'Sumimasen, chuumon wo onegaishimasu' },
+      { zh:'有英文或图片菜单吗？', jp:'英語や写真つきのメニューはありますか？', romaji:'Eigo ya shashin-tsuki no menyuu wa arimasu ka?' },
+      { zh:'有什么推荐的吗？', jp:'おすすめは何ですか？', romaji:'Osusume wa nan desu ka?' },
+      { zh:'我不加糖 / 不加糖浆，谢谢', jp:'シロップ（砂糖）は入れないでください', romaji:'Shiroppu (satou) wa irenaide kudasai' },
+      { zh:'我不要冰块，谢谢', jp:'氷は入れないでください', romaji:'Koori wa irenaide kudasai' },
+      { zh:'牛肉', jp:'ぎゅう', romaji:'Gyuuniku' },
+      { zh:'猪肉', jp:'ぶた', romaji:'Butaniku' },
+      { zh:'鸡肉', jp:'とり', romaji:'Toriniku' },
+      { zh:'请问在哪里结账？', jp:'お会計はどこですか？', romaji:'Okaikei wa doko desu ka?' },
+      { zh:'可以用信用卡吗？', jp:'クレジットカードは使えますか？', romaji:'Kurejitto kaado wa tsukaemasu ka?' },
+      { zh:'很好吃，谢谢！', jp:'とても美味しかったです！', romaji:'Totemo oishikatta desu!' }
+    ]
+  },
+  {
+    id: 'shopping', name: '购物与便利店', icon: '🛍️', color: '#B8802C',
+    phrases: [
+      { zh:'可以试试这件衣服吗？', jp:'試着してもいいですか？', romaji:'Shichaku shite mo ii desu ka?' },
+      { zh:'我只是看看，谢谢', jp:'見ているだけです、ありがとう', romaji:'Mite iru dake desu, arigatou' },
+      { zh:'请帮我把这个便当加热，谢谢', jp:'お弁当を温めてください', romaji:'Obentou wo atatamete kudasai' },
+      { zh:'我需要袋子，谢谢', jp:'袋をお願いします', romaji:'Fukuro wo onegaishimasu' },
+      { zh:'我需要餐具（筷子/勺子），谢谢', jp:'お箸（スプーン）をお願いします', romaji:'Ohashi (supuun) wo onegaishimasu' },
+      { zh:'我没有积分卡，谢谢', jp:'ポイントカードは持っていません', romaji:'Pointo kaado wa motte imasen' },
+      { zh:'可以免税吗？护照在这里', jp:'免税にできますか？パスポートです', romaji:'Menzei ni dekimasu ka? Pasupooto desu' }
+    ]
+  },
+  {
+    id: 'transit', name: '交通与问路', icon: '🚉', color: '#3E6B8A',
+    phrases: [
+      { zh:'我是游客，我不小心迷路了，可以向您问路吗？', jp:'道に迷ってしまいました。道を教えてもらえませんか？', romaji:'Michi ni mayotte shimaimashita. Michi wo oshiete moraemasen ka?' },
+      { zh:'请问 xx 出口在哪里？', jp:'xx 出口はどこですか？', romaji:'xx deguchi wa doko desu ka?' },
+      { zh:'这趟车到 xx 吗？', jp:'この電車は xx に行きますか？', romaji:'Kono densha wa xx ni ikimasu ka?', note:'日本电车常常分岔，上车前指着地名问一下最保险' },
+      { zh:'请问洗手间在哪里？', jp:'お手洗いはどこですか？', romaji:'Otearai wa doko desu ka?' },
+      { zh:'请问附近有可以取现金的ATM吗？', jp:'近くにATMはありますか？', romaji:'Chikaku ni ATM wa arimasu ka?' },
+      { zh:'车站指示牌认字', jp:'改札(检票口) / 出口(出口) / のりば(乘车月台)', romaji:'Kaisatsu / Deguchi / Noriba' }
+    ]
+  },
+  {
+    id: 'stay', name: '住宿与求助', icon: '🏨', color: '#7A5980',
+    phrases: [
+      { zh:'我要办理入住 / 退房', jp:'チェックイン / チェックアウト をお願いします', romaji:'Chekkuin / Chekkuauto wo onegaishimasu' },
+      { zh:'请问可以把行李寄送到大阪的酒店吗？(宅急便)', jp:'大阪のホテルまで荷物を送れますか？（宅急便）', romaji:'Oosaka no hoteru made nimotsu wo okuremasu ka?' },
+      { zh:'请带我回酒店：京都喜织酒店', jp:'「Kyoto Kyori Hotel」までお願いします', romaji:'Kyoto Kyori Hotel made onegaishimasu', note:'打车或问路时出示。如果换了酒店可以在代码里改' }
+    ]
+  },
+  {
+    id: 'emergency', name: '🚨 紧急情况', icon: '🚨', color: '#A31E2A',
+    phrases: [
+      { zh:'请帮帮我', jp:'助けてください', romaji:'Tasukete kudasai' },
+      { zh:'请叫警察 (110)', jp:'警察を呼んでください (110番)', romaji:'Keisatsu wo yonde kudasai' },
+      { zh:'请叫救护车 (119)', jp:'救急車を呼んでください (119番)', romaji:'Kyuukyuusha wo yonde kudasai' },
+      { zh:'我的护照丢了', jp:'パスポートをなくしました', romaji:'Pasupooto wo nakushimashita' },
+      { zh:'我不舒服，附近有医院吗？', jp:'具合が悪いです。近くに病院はありますか？', romaji:'Guai ga warui desu. Chikaku ni byouin wa arimasu ka?' }
+    ]
+  }
+];
 
-      // 交通 & 问路
-      { cat: '交通', jp: 'トイレはどこですか？', kana: 'Toire wa doko desu ka?', zh: '请问洗手间在哪里？' },
-      { cat: '交通', jp: 'ここに行きたいです', kana: 'Koko ni ikitai desu', zh: '我想去这里（展示地图）' },
-      { cat: '交通', jp: 'この電車は〇〇に行きますか？', kana: 'Kono densha wa... ni ikimasu ka?', zh: '这趟车到……吗？' },
+// 初始化收藏夹
+let favorites = JSON.parse(localStorage.getItem('jp_travel_favs') || '[]');
 
-      // 紧急
-      { cat: '紧急', jp: '日本語が分かりません', kana: 'Nihongo ga wakarimasen', zh: '我不会说日语' },
-      { cat: '紧急', jp: '助けてください', kana: 'Tasukete kudasai', zh: '请帮帮我！' }
-    ];
+const navEl = document.getElementById('catNav');
+const mainEl = document.getElementById('main');
+let allCards = [];
 
-    let currentItem = null;
+// Icons
+const speakerIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a9 9 0 0 1 0 12"/></svg>';
+const expandIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
 
-    // 语音朗读
-    function speak(text) {
-      if (!('speechSynthesis' in window)) {
-        alert('您的浏览器暂不支持语音合成');
-        return;
+// Build Nav
+DATA.forEach(cat => {
+  const chip = document.createElement('a');
+  chip.href = '#' + cat.id; chip.className = 'chip'; chip.dataset.target = cat.id;
+  chip.style.setProperty('--chip-color', cat.color);
+  chip.innerHTML = `<span class="dot" style="background:${cat.color}"></span>${cat.name}`;
+  navEl.appendChild(chip);
+});
+
+// Build Sections
+DATA.forEach(cat => {
+  const section = document.createElement('section');
+  section.className = 'section'; section.id = cat.id;
+
+  const head = document.createElement('div'); head.className = 'section-head';
+  head.innerHTML = `<span class="icon">${cat.icon}</span><h2>${cat.name}</h2>`;
+  section.appendChild(head);
+
+  const list = document.createElement('div'); list.className = 'card-list';
+
+  cat.phrases.forEach((p, index) => {
+    const cardId = `${cat.id}-${index}`;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.setProperty('--cat-color', cat.color);
+    card.dataset.search = (p.zh + ' ' + p.jp + ' ' + p.romaji).toLowerCase();
+    card.dataset.id = cardId;
+    
+    const isFav = favorites.includes(cardId);
+
+    card.innerHTML = `
+      <button class="btn-fav ${isFav ? 'active' : ''}">★</button>
+      <div class="zh">${p.zh}</div>
+      <div class="jp">${p.jp}</div>
+      <div class="romaji">${p.romaji}</div>
+      ${p.note ? `<div class="note">💡 ${p.note}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn-speak" type="button">${speakerIcon} 朗读</button>
+        <button class="btn-expand" type="button">${expandIcon} 放大</button>
+      </div>
+    `;
+
+    // Events
+    card.querySelector('.btn-speak').addEventListener('click', () => speak(p.jp));
+    card.querySelector('.btn-expand').addEventListener('click', () => openOverlay(p));
+    card.querySelector('.btn-fav').addEventListener('click', (e) => toggleFav(e.target, cardId));
+
+    list.appendChild(card);
+    allCards.push(card);
+  });
+
+  section.appendChild(list);
+  mainEl.appendChild(section);
+});
+
+// Favorites Logic
+function toggleFav(btn, id) {
+  const index = favorites.indexOf(id);
+  if(index > -1) favorites.splice(index, 1);
+  else favorites.push(id);
+  
+  localStorage.setItem('jp_travel_favs', JSON.stringify(favorites));
+  btn.classList.toggle('active');
+  
+  // Refresh view if currently in 'fav' tab
+  if(document.querySelector('.chip[data-target="fav"]').classList.contains('active')) {
+    filterFavs(true);
+  }
+}
+
+function filterFavs(showOnlyFavs) {
+  document.getElementById('tips').style.display = showOnlyFavs ? 'none' : 'block';
+  document.querySelectorAll('.section:not(#tips)').forEach(sec => {
+    let visible = 0;
+    sec.querySelectorAll('.card').forEach(card => {
+      const isFav = favorites.includes(card.dataset.id);
+      if(showOnlyFavs && !isFav) {
+        card.classList.add('hidden');
+      } else {
+        card.classList.remove('hidden');
+        visible++;
       }
-      window.speechSynthesis.cancel(); // 停止前面的播放
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'ja-JP';
-      utter.rate = 0.85; // 语速稍慢一点更清晰
-      window.speechSynthesis.speak(utter);
+    });
+    sec.style.display = (showOnlyFavs && visible === 0) ? 'none' : 'block';
+  });
+}
+
+// Nav interaction
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', (e) => {
+    const target = e.currentTarget.dataset.target;
+    document.querySelectorAll('.chip').forEach(c => {
+      c.classList.remove('active');
+      c.style.background = ''; c.style.color = ''; c.style.borderColor = '';
+    });
+    
+    e.currentTarget.classList.add('active');
+    e.currentTarget.style.background = e.currentTarget.style.getPropertyValue('--chip-color');
+    e.currentTarget.style.color = '#fff';
+
+    if(target === 'fav') {
+      e.preventDefault();
+      filterFavs(true);
+      window.scrollTo(0, 0);
+    } else {
+      filterFavs(false);
     }
+  });
+});
 
-    // 渲染卡片
-    function renderList(cat = 'all') {
-      const container = document.getElementById('list');
-      container.innerHTML = '';
-      const filtered = cat === 'all' ? PHRASES : PHRASES.filter(item => item.cat === cat);
+// Text to Speech
+function speak(text) {
+  if(!('speechSynthesis' in window)) return alert('当前浏览器不支持语音');
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ja-JP'; utter.rate = 0.9;
+  const voices = window.speechSynthesis.getVoices();
+  const jaVoice = voices.find(v => v.lang.startsWith('ja'));
+  if(jaVoice) utter.voice = jaVoice;
+  window.speechSynthesis.speak(utter);
+}
 
-      filtered.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-          <div class="card-content" onclick="openModal('${encodeURIComponent(JSON.stringify(item))}')">
-            <div class="jp-text">${item.jp}</div>
-            <div class="kana-text">${item.kana}</div>
-            <div class="zh-text">${item.zh}</div>
-          </div>
-          <button class="sound-btn" onclick="speak('${item.jp}')" title="播放读音">🔊</button>
-        `;
-        container.appendChild(div);
-      });
-    }
+// Overlay (Expand & Icebreaker)
+const overlay = document.getElementById('overlay');
+function openOverlay(p) {
+  document.getElementById('overlayZh').textContent = p.zh;
+  document.getElementById('overlayJp').textContent = p.jp;
+  document.getElementById('overlayRomaji').textContent = p.romaji;
+  overlay.classList.remove('hidden');
+}
+function openIcebreaker() {
+  openOverlay(DATA[0].phrases[0]); // 显示“我是游客”第一句话
+  speak(DATA[0].phrases[0].jp);    // 自动朗读
+}
+document.getElementById('overlayClose').addEventListener('click', () => overlay.classList.add('hidden'));
+overlay.addEventListener('click', (e) => { if(e.target === overlay) overlay.classList.add('hidden'); });
 
-    // 分类切换
-    function filterCat(cat, btn) {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderList(cat);
-    }
-
-    // 弹出大字
-    function openModal(dataStr) {
-      const item = JSON.parse(decodeURIComponent(dataStr));
-      currentItem = item;
-      document.getElementById('mJp').innerText = item.jp;
-      document.getElementById('mKana').innerText = item.kana;
-      document.getElementById('mZh').innerText = item.zh;
-      document.getElementById('mSoundBtn').onclick = () => speak(item.jp);
-      document.getElementById('modal').classList.add('show');
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('show');
-    }
-
-    // 初始化渲染
-    renderList('all');
-  </script>
+// Search
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  filterFavs(false); // 取消收藏过滤
+  document.querySelector('.chip[data-target="fav"]').classList.remove('active');
+  
+  document.querySelectorAll('.section:not(#tips)').forEach(section => {
+    let count = 0;
+    section.querySelectorAll('.card').forEach(card => {
+      const match = !q || card.dataset.search.includes(q);
+      card.classList.toggle('hidden', !match);
+      if(match) count++;
+    });
+    section.style.display = count === 0 ? 'none' : 'block';
+  });
+});
+</script>
 </body>
 </html>
